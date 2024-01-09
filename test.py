@@ -29,4 +29,4 @@ plt.savefig("train.png")
 
 #データ処理
 train = train.fillna({"Age" : 30, "Embarked" : "0"})
-test= test.fillna({"Age" : 30, "Fare" : "0"})
+test= test.fillna({"Age" : 30, "Fare" : test.Fare.mean()})
