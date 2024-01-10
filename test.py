@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from scipy import stats
+from scipy import stats as st
 import matplotlib.pyplot as plt
 
 train = pd.read_csv("data/train.csv")
@@ -34,8 +34,11 @@ train = train.fillna({"Age" : 30, "Embarked" : "0"})
 test= test.fillna({"Age" : 30, "Fare" : test.Fare.mean()})
 
 #モデル構築
-train_y = train.pop("Survived")
-del train["Name"], train["Ticket"], train["Cabin"]
-x = train.values
+train_x = train.drop(columns=["PassengerId", "Survived", "Name", "Ticket", "Cabin"])
+train_y = train["Survived"]
+x = train_x.values
 y = train_y.values
 
+print(x)
+print(y)
+#result = st.linregress(x, y)
