@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy import stats
 import matplotlib.pyplot as plt
 
 train = pd.read_csv("data/train.csv")
@@ -11,18 +12,19 @@ train['Embarked'] = train['Embarked'].map({'S': 0, 'C': 1, 'Q': 2})
 test['Sex'] = test['Sex'].map({'male': 0, 'female': 1})
 test['Embarked'] = test['Embarked'].map({'S': 0, 'C': 1, 'Q': 2})
 
+"""
 #データ確認
 print(train.head())
 print(test.head())
-"""
+
 #統計情報
 print(train.describe())
 print(test.describe())
-"""
+
 #欠損確認
 print(train.isnull().sum())
 print(test.isnull().sum())
-
+"""
 #データ分布
 train.hist(figsize=(12, 10))
 plt.savefig("train.png")
@@ -30,3 +32,10 @@ plt.savefig("train.png")
 #データ処理
 train = train.fillna({"Age" : 30, "Embarked" : "0"})
 test= test.fillna({"Age" : 30, "Fare" : test.Fare.mean()})
+
+#モデル構築
+train_y = train.pop("Survived")
+del train["Name"], train["Ticket"], train["Cabin"]
+x = train.values
+y = train_y.values
+
