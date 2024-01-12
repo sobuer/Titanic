@@ -36,5 +36,6 @@ test= test.fillna({"Age" : 30, "Fare" : test.Fare.mean()})
 x = train.drop(columns=["PassengerId", "Survived", "Name", "Ticket", "Cabin"])
 y = train["Survived"]
 
+
 model = LinearRegression()
 model.fit(x, y)
