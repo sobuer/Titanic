@@ -12,7 +12,7 @@ train['Embarked'] = train['Embarked'].map({'S': 0, 'C': 1, 'Q': 2})
 test['Sex'] = test['Sex'].map({'male': 0, 'female': 1})
 test['Embarked'] = test['Embarked'].map({'S': 0, 'C': 1, 'Q': 2})
 
-"""
+
 #データ確認
 print(train.head())
 print(test.head())
@@ -28,29 +28,14 @@ print(test.isnull().sum())
 #データ分布
 train.hist(figsize=(12, 10))
 plt.savefig("train.png")
-"""
+
 #データ処理
 train = train.fillna({"Age" : 30, "Embarked" : "0"})
 test= test.fillna({"Age" : 30, "Fare" : test.Fare.mean()})
 
-"""
-#モデル構築
-train_x = train.drop(columns=["PassengerId", "Survived", "Name", "Ticket", "Cabin"])
-train_y = train["Survived"]
-x = train_x.values
-y = train_y.values
-
-print(x)
-print(y)
-result = st.linregress(x, y)
-"""
-
 #モデル構築
 x = train.drop(columns=["PassengerId", "Survived", "Name", "Ticket", "Cabin"])
-
 y = train["Survived"]
-
 
 model = LinearRegression()
 model.fit(x, y)
-print(model.fit(x, y))
