@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from scipy import stats as st
+from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
 train = pd.read_csv("data/train.csv")
@@ -24,15 +24,16 @@ print(test.describe())
 #欠損確認
 print(train.isnull().sum())
 print(test.isnull().sum())
-"""
+
 #データ分布
 train.hist(figsize=(12, 10))
 plt.savefig("train.png")
-
+"""
 #データ処理
 train = train.fillna({"Age" : 30, "Embarked" : "0"})
 test= test.fillna({"Age" : 30, "Fare" : test.Fare.mean()})
 
+"""
 #モデル構築
 train_x = train.drop(columns=["PassengerId", "Survived", "Name", "Ticket", "Cabin"])
 train_y = train["Survived"]
@@ -41,4 +42,15 @@ y = train_y.values
 
 print(x)
 print(y)
-#result = st.linregress(x, y)
+result = st.linregress(x, y)
+"""
+
+#モデル構築
+x = train.drop(columns=["PassengerId", "Survived", "Name", "Ticket", "Cabin"])
+
+y = train["Survived"]
+
+
+model = LinearRegression()
+model.fit(x, y)
+print(model.fit(x, y))
