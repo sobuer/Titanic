@@ -6,38 +6,98 @@ from sklearn.linear_model import LogisticRegression
 train_csv = pd.read_csv("data/train.csv")
 test_csv = pd.read_csv("data/test.csv")
 
-#データ選択
-train_data = train_csv.drop(columns=["PassengerId", "Name", "Ticket", "Cabin"])
-test_data = test_csv.drop(columns=["PassengerId", "Name", "Ticket", "Cabin"])
+class Titanic:
+    def __init__(self, train_csv, test_csv):
 
-#欠損データ処理（訓練、テスト）
-train_data["Age"] = train_data["Age"].fillna(train_data["Age"].median())
-train_data["Embarked"] = train_data["Embarked"].fillna(train_data["Embarked"].mode())
-test_data["Age"] = test_data["Age"].fillna(test_data["Age"].median())
-test_data["Fare"] = test_data["Fare"].fillna(test_data["Fare"].mean())
+        #データ選択
+        self.train_data = train_csv.drop(columns=["PassengerId", "Name", "Ticket", "Cabin"])
+        self.test_data = test_csv.drop(columns=["PassengerId", "Name", "Ticket", "Cabin"])
 
+        #訓練、テストデータ完成
+        self.train = self.process_data(self.train_data)
+        self.test = self.process_data(self.test_data)
 
-#数値変換　c:1、Q:1、S2
-train_012 = pd.DataFrame(train_data["Embarked"])
-test_012 = pd.DataFrame(test_data["Embarked"])
-#訓練
-le = LabelEncoder()
-le.fit(train_012)
-train_data['Embarked'] = le.transform(train_012)
-#テスト
-LE = LabelEncoder()
-LE.fit(test_012)
-test_data['Embarked'] = LE.transform(test_012)
-
-#数値変換 0、1
-train = pd.get_dummies(train_data, drop_first=True, prefix='', prefix_sep='')
-test = pd.get_dummies(test_data, drop_first=True, prefix='', prefix_sep='')
-
-#変数
-x_train = train.drop(columns="Survived")
-y_train = train["Survived"]
+        #ロジスティック回帰
+        self.logistic = LogisticRegression()
 
 
-model = LogisticRegression()
-model.fit(x_train, y_train)
 
+
+
+    #データ処理
+    def process_data(self, df):
+
+        #欠損データ処理
+        df["Age"] = df["Age"].fillna(df["Age"].median())
+        df["Embarked"] = df["Embarked"].fillna(df["Embarked"].mode())
+        df["Fare"] = df["Fare"].fillna(df["Fare"].mean())
+
+        #カテゴリー変数をダミー変数へ
+        df_proc = self.dummies(df)
+
+        return df_proc
+
+
+    #ダミー変数
+    def dummies(self, df):
+
+        #数値変換　c:1、Q:1、S:2
+        df_le = pd.DataFrame(df["Embarked"])
+        le = LabelEncoder()
+        df['Embarked'] = le.fit_transform(df_le)
+
+        #数値変換 female:0、male:1
+        df_dum = pd.get_dummies(df, drop_first=True, prefix='', prefix_sep='')
+
+        return df_dum
+    
+
+    #訓練用データセット
+    def dataset_train(self, train):
+        #変数
+        x_train = self.train.drop(columns="Survived")
+        y_train = self.train["Survived"]
+        return x_train, y_train
+
+    #テスト用データセット
+    def dataset_test(self, test):
+        x_test = self.train
+        return x_test
+    
+
+    #省略(メインに書けない？）
+    #モデルの訓練
+    def model(self, x, y):
+        self.logistic.fit(x, y)
+
+
+    #生存者予測
+    def survived_predict(self, x):
+        y = self.logistic.predict(x)
+        return y
+
+    #結果確認
+    def result(self, y):
+        self.test['Survived'] = y
+        print(test['Survived'])
+
+
+
+#メイン
+def main(titanic):
+    #学習用x,y
+    (x, y) = titanic.dataset_train(train)
+    #学習
+    titanic.model(x, y)
+
+    #テスト用x
+    x_test = titanic.dataset_test(test)
+    #予測
+    survived = titanic.survived_predict(x_test)
+    #結果
+    titanic.result(survived)
+    
+
+if __name__ == "__main__":
+    titanic = Titanic(train_csv, test_csv)
+    main(titanic)
