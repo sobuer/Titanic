@@ -11,7 +11,7 @@ class Titanic:
 
         #データ選択
         self.train_data = train_csv.drop(columns=["PassengerId", "Name", "Ticket", "Cabin"])
-        self.test_data = test_csv.drop(columns=["PassengerId", "Name", "Ticket", "Cabin"])
+        self.test_data = test_csv.drop(columns=["Name", "Ticket", "Cabin"])
 
         #訓練、テストデータ完成
         self.train = self.process_data(self.train_data)
@@ -19,9 +19,6 @@ class Titanic:
 
         #ロジスティック回帰
         self.logistic = LogisticRegression()
-
-
-
 
 
     #データ処理
@@ -53,19 +50,20 @@ class Titanic:
     
 
     #訓練用データセット
-    def dataset_train(self, train):
-        #変数
-        x_train = self.train.drop(columns="Survived")
-        y_train = self.train["Survived"]
-        return x_train, y_train
+    def dataset_train(self, dataname):
+        if dataname == "train":
+            #変数
+            x_train = self.train.drop(columns="Survived")
+            y_train = self.train["Survived"]
+            return x_train, y_train
 
     #テスト用データセット
-    def dataset_test(self, test):
-        x_test = self.train
-        return x_test
+    def dataset_test(self, dataname):
+        if dataname == "test":
+            x_test = self.test.drop(columns="PassengerId")
+            return x_test
     
 
-    #省略(メインに書けない？）
     #モデルの訓練
     def model(self, x, y):
         self.logistic.fit(x, y)
@@ -76,22 +74,26 @@ class Titanic:
         y = self.logistic.predict(x)
         return y
 
+
     #結果確認
     def result(self, y):
         self.test['Survived'] = y
-        print(test['Survived'])
+        print(self.test)
 
+        #ファイル出力
+        solution = self.test.loc[:, ["PassengerId", "Survived"]]
+        solution.to_csv("titanic.csv", index=False)
 
 
 #メイン
 def main(titanic):
     #学習用x,y
-    (x, y) = titanic.dataset_train(train)
+    (x, y) = titanic.dataset_train("train")
     #学習
     titanic.model(x, y)
 
     #テスト用x
-    x_test = titanic.dataset_test(test)
+    x_test = titanic.dataset_test("test")
     #予測
     survived = titanic.survived_predict(x_test)
     #結果
